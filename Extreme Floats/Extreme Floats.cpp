@@ -578,14 +578,17 @@ void addExponent(node* tail1, node* tail2, int exponent1, int exponent2, int dig
 			val2 = toInt(tail2->digit);
 		}
 		else
+		{
 			val1 = val2 = 0;
+			if (carry)
+				sumExponent++;
+		}
 		if (tail1Pushed)
 			val1 = 0;
 		if (tail2Pushed)
 			val2 = 0;
 
 		int sum = carry + val1 + val2;
-
 		if (sum <= 9)
 		{
 			/*
@@ -1153,6 +1156,116 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 	return;
 	
 }
+
+void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, int exponent2, int digit1, int digit2, int sign1, int sign2, node*& answerHead, node*& answerTail, int& answerExponent, int& answerSign, int precision)
+{
+	/*
+	If the two numbers to be divided have the same sign then it is positive.
+	If they have different signs, it is negative. 
+	If one of the signs is zero, then the sign of the answer is zero
+	*/
+
+	if (sign1 == sign2)
+		answerSign = 1;
+	else
+		answerSign = -1;
+	if (sign1 == 0 || sign2 == 0)
+		answerSign = 0;
+
+	bool isFullyDivided = false;
+
+	/*
+	The following linked list has only one element and it has the value 1.
+	This is the one to be incremented on the counter.
+	*/
+	node* oneHead;
+	node* oneTail;
+	create(oneHead,oneTail);
+	int oneExpnent = 1;
+	int oneDigit = 1;
+	int oneSign = 1;
+	node* p = new node;
+	p->digit = '1';
+	insertNodeAtHead(oneHead, oneTail, p);
+
+	/*
+	This will ultimately be the 
+	*/
+	node* counterHead;
+	node* counterTail;
+	create(counterHead, counterTail);
+	int counterExponent = 1;
+	int counterDigit = 1;
+	int counterSign = 1;
+	p = new node;
+	p->digit = '1';
+	insertNodeAtHead(oneHead, oneTail, p);
+
+	node* productCheckerHead;
+	node* productCheckerTail;
+	create(productCheckerHead, productCheckerTail);
+	int productCheckerExponent = 0;
+	int productCheckerDigits = 0;
+	int productCheckerSign = 0;
+	
+
+	int intermediateExponent = 0;
+
+	while (precision != 0 && !isFullyDivided)
+	{
+		multiply(counterHead, counterTail, head2, tail2, counterExponent, exponent1, counterDigit, digit2, counterSign, sign2, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign);
+		
+		int len = lengthOfNode(productCheckerHead);
+		if (len > productCheckerExponent)
+			productCheckerDigits = len;
+		else
+			productCheckerDigits = productCheckerExponent;
+
+		int comparisionValue = isGreater(productCheckerHead, head1, productCheckerDigits, digit1, productCheckerExponent, exponent1);
+		if (comparisionValue >= 0)
+		{
+			destroyLinkedList(productCheckerHead, productCheckerTail);
+			subtract(counterHead, oneHead, counterTail, oneTail, counterExponent, oneExpnent, counterDigit, oneDigit, counterSign, oneSign, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign);
+			destroyLinkedList(counterHead, counterTail);
+			copyLinkedList(counterHead, counterTail, productCheckerHead);
+			destroyLinkedList(productCheckerHead, productCheckerTail);
+			while (counterHead != NULL || counterExponent!=0)
+			{
+				node* p = new node;
+				if (counterHead != NULL)
+				{
+					p->digit = counterHead->digit;
+					counterHead = counterHead->next;
+				}
+				else
+					p->digit = '0';
+				insertNodeAtTail(answerHead, answerTail, p);
+				
+			}
+			counterHead = NULL;
+			if (comparisionValue == 0)
+			{
+				isFullyDivided == true;
+			}
+		}
+		else
+		{
+			destroyLinkedList(productCheckerHead, productCheckerTail);
+			addExponent(counterTail,oneTail,counterExponent, oneExpnent,counterDigit,oneDigit,productCheckerHead,productCheckerTail,productCheckerSign);
+			destroyLinkedList(counterHead, counterTail);
+			copyLinkedList(counterHead, counterTail, productCheckerHead);
+			
+			int len = lengthOfNode(counterHead);
+			if (len > counterExponent)
+				counterDigit = len;
+			else
+				counterDigit = counterExponent;
+
+			destroyLinkedList(productCheckerHead, productCheckerTail);
+		}
+	}
+}
+
 int main()
 {
 
@@ -1177,13 +1290,14 @@ int main()
 
 	//  cout<<"NUM 2: ";
 
-
+	addExponent(tail1, tail2, exponent1, exponent2, digits1, digits2, resultHead, resultTail, resultExponent);
+	resultSign = 1;
 	 // cout<<"Number 2 Digits: "<<digits2<<" Exponents 2 : "<<exponent2;
 	  //cout<<"Exponent 1 Before Subtract: "<<exponent1<<endl;
 	  //cout<<"Exponent 2 Before Subtract: "<<exponent2<<endl;
 	 // subtract(head1, head2, tail1, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
-	multiply(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
-	  cout<<"The product is ";
+	//multiply(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
+	  cout<<"The sum is ";
 	displayNumberExponent(resultHead, resultExponent, resultSign);
 	cout << endl;
 	return 0;
