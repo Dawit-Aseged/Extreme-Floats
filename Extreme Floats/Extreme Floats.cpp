@@ -12,7 +12,6 @@ struct node
 };
 
 int lengthOfNodeFromBack(node*);
-int lengthOfNode(node*);
 
 void create(node*& head, node*& tail)
 {
@@ -74,13 +73,6 @@ void insertNode(node*& head, node*& tail, node*& p, node*& prev)
 
 void deleteNode(node*& head, node*& tail, node*& p)
 {
-	if (lengthOfNode(head) == 1)
-	{
-		head = NULL;
-		tail = NULL;
-		delete p;
-		return;
-	}
 	if (p->behind == NULL)
 	{
 		/*
@@ -214,8 +206,6 @@ int trim(node*& tail)
 {
 	node* p = tail;
 	int cnt = 0;
-	if (lengthOfNodeFromBack(tail) == 1 && tail->digit == '0')
-		return 0;
 	while (tail->digit == '0')
 	{
 		/*
@@ -356,12 +346,7 @@ void getNumberExponent(node*& head, node*& tail, int& exponent, int& digits, int
 		//When the number is finished being inputted and it is neither negative nor zero, it must be positive.
 		sign = 1;
 	}
-	if (tail == NULL)
-	{
-		node* p = new node;
-		p->digit = '0';
-		insertNodeAtTail(head, tail, p);
-	}
+
 	digits -= trim(tail);
 }
 
@@ -371,7 +356,6 @@ void displayNumberExponent(node* head, int exponent, int sign)
 	if (sign == -1)
 		cout << '-';
 	node* p = new node;
-
 	while (head != NULL)
 	{
 		if (exponent > 0)
@@ -428,7 +412,6 @@ void displayNumberExponent(node* head, int exponent, int sign)
 		*/
 		cout << head->digit;
 		head = head->next;
-
 	}
 }
 
@@ -578,17 +561,14 @@ void addExponent(node* tail1, node* tail2, int exponent1, int exponent2, int dig
 			val2 = toInt(tail2->digit);
 		}
 		else
-		{
 			val1 = val2 = 0;
-			if (carry)
-				sumExponent++;
-		}
 		if (tail1Pushed)
 			val1 = 0;
 		if (tail2Pushed)
 			val2 = 0;
 
 		int sum = carry + val1 + val2;
+
 		if (sum <= 9)
 		{
 			/*
@@ -943,18 +923,6 @@ void decrementByOneWithoutExponent(node*& head, node*& tail, int& digits, int& e
 	}
 }
 
-void destroyLinkedList(node*& head, node*& tail)
-{
-	
-	while (head != NULL)
-	{
-		node* p = head;
-		deleteNode(head, tail, p);
-	}
-}
-
-
-
 void copyLinkedList(node*& head1, node*& tail1, node* head2)
 {
 	create(head1, tail1);
@@ -973,7 +941,6 @@ void copyLinkedList(node*& head1, node*& tail1, node* head2)
 }
 void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1, int exponent2, int digit1, int digit2, int sign1, int sign2, node*& productHead, node*& productTail, int& productExponent, int& productSign)
 {
-
 	int num1afterDecimal, num2afterDecimal, productAfterDecimal;
 	/*
 	This gets the number of digits after the decimal of the first number.
@@ -990,137 +957,20 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 	else
 		num2afterDecimal = digit2 - exponent2;
 
+
+	num1afterDecimal = digit1 - exponent1;
+	num2afterDecimal = digit2 - exponent2;
 	productAfterDecimal = num1afterDecimal + num2afterDecimal;
-	node* pseudoSumHead;
-	node* pseudoSumTail;
-	int pseudoSumExponent = 0;
-	int pseudoSumDigits = 0;
-	create(pseudoSumHead, pseudoSumTail);
-	
-	node* productCloneHead;
-	node* productCloneTail;
-	int productCloneExponent = 0;
-	int productCloneDigits = 0;
-	create(productCloneHead, productCloneTail);
-
-	node* p = new node;
-	p->digit = '0';
-	insertNodeAtHead(productCloneHead, productCloneTail, p);
-	p = NULL;
-
-	int counter = 0;
-
-	while (tail2 != NULL)
-	{
-		node* num1 = new node;
-		node* num2 = new node;
-		node* p = new node;
-		
-		int carry = 0;
-		num1 = tail1;
-		num2->digit = tail2->digit;
-
-		for(int i = 0; i < counter; i++)
-		{
-			node* x = new node;
-			x->digit = '0';
-			insertNodeAtHead(pseudoSumHead, pseudoSumTail, x);
-			pseudoSumDigits++;
-			pseudoSumExponent++;
-		}
-		while (num1 != NULL)
-		{
-			int product = toInt(num1->digit) * toInt(num2->digit) + carry;
-			cout << endl;
-			cout << "Num 1 digit: " << num1->digit << endl;
-			cout << "Num 2 digit: " << num2->digit << endl;
-			cout << "Product is : " << product << endl;
-			cout << "Carry is : " << carry << endl;
-		
-			
-			int result = product % 10;
-			if (num1->behind == NULL)
-			{
-				while (product)
-				{
-					cout << endl << endl << endl << endl << "INTERNAL PRODUCT: " << product << endl << endl;
-					p->digit = toChar(result);
-					insertNodeAtHead(pseudoSumHead, pseudoSumTail, p);
-					pseudoSumDigits++;
-					pseudoSumExponent++;
-					p = new node;
-					product /= 10;
-					result = product;
-				}
-				num1 = num1->behind;
-				
-				continue;
-				
-			}
-			cout << " Result is : " << result << endl;
-			p->digit = toChar(result);
-			insertNodeAtHead(pseudoSumHead, pseudoSumTail, p);
-			pseudoSumDigits++;
-			pseudoSumExponent++;
-			carry = product / 10;
-			num1 = num1->behind;
-			p = new node;
-
-			
-		}
-		/*
-		In order to add psedo sum to the product head
-		1. The product linked list is emptied.
-		2. The product clone and psedo sum are added and then put into product linked list.
-		3. The product clone linked list is emptied. 
-		4. The product is copied to product clone.
-		5. The pseudo sum linked list is emptied.
-		*/
-
-		/*1*/destroyLinkedList(productHead, productTail);
-		
-		/*2*/addExponent(productCloneTail, pseudoSumTail, productCloneExponent, pseudoSumExponent, productCloneDigits, pseudoSumDigits, productHead, productTail, productExponent);
-		
-		/*3*/destroyLinkedList(productCloneHead, productCloneTail);
-		/*4*/copyLinkedList(productCloneHead, productCloneTail, productHead);
-		
-		/*5*/destroyLinkedList(pseudoSumHead, pseudoSumTail);
-		destroyLinkedList(productHead, productTail);
-		
-		addExponent(productCloneTail, pseudoSumTail, productCloneExponent, pseudoSumExponent, productCloneDigits, pseudoSumDigits, productHead, productTail, productExponent);
-		destroyLinkedList(productCloneHead, productCloneTail);
-		
-		copyLinkedList(productCloneHead, productCloneTail, productHead);
-		destroyLinkedList(pseudoSumHead, pseudoSumTail);
-		productCloneExponent = productExponent;
-		
-		
-		//(lengthOfNode(productHead) > productExponent) ? productCloneDigits = lengthOfNode(productHead) : productCloneDigits = productExponent;
-		if (lengthOfNode(productHead) > productExponent)
-			productCloneDigits = lengthOfNode(productHead);
-		else
-			productCloneDigits = productExponent;
-		pseudoSumDigits = pseudoSumExponent = 0;
-
-		cout << "Product Clone digits: " << productCloneDigits << endl;;
-		tail2 = tail2->behind;
-		counter++;
-		
-
-		//p = 
-
-
-
-
-	}
-
+	cout << "N" << exponent2;
+	cout << endl;
+	cout << "After decimal Num 1: " << num1afterDecimal << endl;
+	cout << "After decimal Num 2: " << num2afterDecimal << endl;
 	return;
-	
 	/*
 	/*
 		The following paragraph of code creates a linked list with only one element.
 		The value of that element is 1.
-	
+
 
 	node* valueOneHead;
 	node* valueOneTail;
@@ -1183,205 +1033,6 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 	productExponent -= digSubSave;
 	*/
 }
-
-void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, int exponent2, int digit1, int digit2, int sign1, int sign2, node*& answerHead, node*& answerTail, int& answerExponent, int& answerSign, int precision)
-{
-	/*
-	If the two numbers to be divided have the same sign then it is positive.
-	If they have different signs, it is negative. 
-	If one of the signs is zero, then the sign of the answer is zero
-	*/
-	destroyLinkedList(answerHead, answerTail);
-	if (sign1 == sign2)
-		answerSign = 1;
-	else
-		answerSign = -1;
-	if (sign1 == 0 || sign2 == 0)
-		answerSign = 0;
-
-	sign1 = sign2 = 1; // This is to make sure that operation that involve the difference of the original numbers is only done in absolute value.
-	bool isFullyDivided = false;
-	bool isExponentFixed = false;
-	/*
-	The following linked list has only one element and it has the value 1.
-	This is the one to be incremented on the counter.
-	*/
-	node* oneHead;
-	node* oneTail;
-	create(oneHead,oneTail);
-	int oneExpnent = 1;
-	int oneDigit = 1;
-	int oneSign = 1;
-	node* p = new node;
-	p->digit = '1';
-	insertNodeAtHead(oneHead, oneTail, p);
-
-	/*
-	This will ultimately be the quotient of subsequent divides.
-	*/
-	node* counterHead;
-	node* counterTail;
-	create(counterHead, counterTail);
-	int counterExponent = 1;
-	int counterDigit = 1;
-	int counterSign = 1;
-	p = new node;
-	p->digit = '1';
-	insertNodeAtHead(counterHead, counterTail, p);
-
-	/*
-	Temporary linked list that holds different data depending upon the situation;
-	*/
-	node* productCheckerHead;
-	node* productCheckerTail;
-	create(productCheckerHead, productCheckerTail);
-	int productCheckerExponent = 0;
-	int productCheckerDigits = 0;
-	int productCheckerSign = 0;
-	
-
-	int intermediateExponent = 0;
-	int precisionCopy = precision;
-	while (precisionCopy > 0 && !isFullyDivided)
-	{
-		cout << endl << "Head: ";
-		displayNumber(head1);
-		cout << endl;
-		
-		/*
-		Multiplies the denomeinator 'n' times.
-		*/
-		multiply(counterHead, counterTail, head2, tail2, counterExponent, exponent2, counterDigit, digit2, counterSign, sign2, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign);
-		
-		/*
-		Set the value of the product's digits.
-		*/
-		int len = lengthOfNode(productCheckerHead);
-		if (len > productCheckerExponent)
-			productCheckerDigits = len;
-		else
-			productCheckerDigits = productCheckerExponent;
-
-		int comparisionValue = isGreater(productCheckerHead, head1, productCheckerDigits, digit1, productCheckerExponent, exponent1);
-		if (comparisionValue >= 0)
-		{
-			
-			/*
-			This occurs if the product of the counter and the denominator is greater than that numerator.
-			The following code simply means:
-				
-					counter--;
-			*/
-			if (comparisionValue != 0)
-			{
-				destroyLinkedList(productCheckerHead, productCheckerTail);
-				subtract(counterHead, oneHead, counterTail, oneTail, counterExponent, oneExpnent, counterDigit, oneDigit, counterSign, oneSign, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign);
-				destroyLinkedList(counterHead, counterTail);
-				copyLinkedList(counterHead, counterTail, productCheckerHead);
-			}
-			
-			//int counterExponentCopy = counterExponent
-			while (counterHead != NULL || counterExponent!=0)
-			{
-				
-				/*
-				Copies all the reqired digits to the answer linked list.
-				*/
-				node* p = new node;
-				if (counterHead != NULL)
-				{
-					p->digit = counterHead->digit;
-					counterHead = counterHead->next;
-					
-				}
-				else
-					p->digit = '0'; // If expnent is greater than the number of digits then the value 0 is added to the answer.
-				counterExponent--;
-				insertNodeAtTail(answerHead, answerTail, p);
-				//cout << endl << "=> ";
-				//displayNumber(answerHead);
-				//cout << endl;
-				
-			}
-
-			if (!isExponentFixed) // This occurs once to set the expnent of the answer.
-			{
-				isExponentFixed;
-				answerExponent = productCheckerExponent;
-			}
-			if (comparisionValue == 0)
-			{
-				isFullyDivided = true;  // If the number is fully divided.
-				return;
-			}
-			int len = lengthOfNode(productCheckerHead);
-			if (len > productCheckerExponent)
-				productCheckerDigits = len;
-			else
-				productCheckerDigits = productCheckerExponent;
-
-			destroyLinkedList(productCheckerHead, productCheckerTail);
-			counterExponent++;
-			multiply(counterHead, counterTail, head2, tail2, counterExponent, exponent1, counterDigit, digit2, counterSign, sign2, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign); // Holds the product of counter and denominator
-			destroyLinkedList(counterHead, counterTail); //Clears space 
-			len = lengthOfNode(productCheckerHead); // Gets approperiate productCheckerDigits
-			if (len > productCheckerExponent)
-				productCheckerDigits = len;
-			else
-				productCheckerDigits = productCheckerExponent;
-			cout << "PE->" << counterExponent;
-			cout << endl << "Counter 1: "; displayNumberExponent(counterHead, counterExponent, sign1); 
-			cout << endl;
-			cout << endl << "Product :"; displayNumberExponent(productCheckerHead, productCheckerExponent, 1);
-			cout << endl;
-
-			subtract(head1, productCheckerHead, tail1, productCheckerTail,exponent1, productCheckerExponent, digit1, productCheckerDigits, sign1, productCheckerSign, counterHead, counterTail, counterExponent, counterSign); // Subtracts product from tail1
-			destroyLinkedList(head1, tail1);
-			copyLinkedList(head1, tail1, counterHead); // Replaces the numerator for further evaluation
-			exponent1 = counterExponent;
-
-			cout << "Changed : "; displayNumberExponent(head1, exponent1, sign1);
-
-			len = lengthOfNode(counterHead); 
-			if (len > counterExponent)	//Gets approperiate digits for the numerator
-				digit1 = len;
-			else
-				digit1 = counterExponent;
-			
-			len = lengthOfNode(answerHead);
-			int answerDigit;
-			if (len > answerExponent)
-				answerDigit = len;
-			else
-				answerDigit = answerExponent;
-
-			precisionCopy = precision - answerDigit;
-			
-		}
-		else
-		{
-			/*
-			The following code is simply:
-				
-					counterTail++;
-			*/
-			
-			destroyLinkedList(productCheckerHead, productCheckerTail);
-			addExponent(counterTail,oneTail,counterExponent, oneExpnent,counterDigit,oneDigit,productCheckerHead,productCheckerTail,productCheckerExponent); //In this cas product checker holds the counterTail++;
-			destroyLinkedList(counterHead, counterTail);
-			copyLinkedList(counterHead, counterTail, productCheckerHead);
-			
-			int len = lengthOfNode(counterHead);
-			if (len > counterExponent)
-				counterDigit = len;
-			else
-				counterDigit = counterExponent;
-			counterExponent = productCheckerExponent; //Sets approperiate exponent to counter.
-			destroyLinkedList(productCheckerHead, productCheckerTail);
-		}
-	}
-}
-
 int main()
 {
 
@@ -1397,7 +1048,7 @@ int main()
 	displayMenu();
 	getNumberExponent(head1, tail1, exponent1, digits1, sign1);
 	cout << endl;
-	cout<<"Number 1 Digits: "<<digits1<<" Exponents 1 : "<<exponent1;
+	//cout<<"Number 1 Digits: "<<digits1<<" Exponents 1 : "<<exponent1;
 
 	cout << endl;
 	getNumberExponent(head2, tail2, exponent2, digits2, sign2);
@@ -1406,17 +1057,13 @@ int main()
 
 	//  cout<<"NUM 2: ";
 
-	addExponent(tail1, tail2, exponent1, exponent2, digits1, digits2, resultHead, resultTail, resultExponent);
-	resultSign = 1;
+
 	 // cout<<"Number 2 Digits: "<<digits2<<" Exponents 2 : "<<exponent2;
 	  //cout<<"Exponent 1 Before Subtract: "<<exponent1<<endl;
 	  //cout<<"Exponent 2 Before Subtract: "<<exponent2<<endl;
 	  subtract(head1, head2, tail1, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
 	//multiply(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
-
-	//divide(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign,15);
-
-	  cout<<"The answer is ";
+	//  cout<<"The product is ";
 	displayNumberExponent(resultHead, resultExponent, resultSign);
 	cout << endl;
 	return 0;
