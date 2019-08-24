@@ -1244,6 +1244,9 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 	int precisionCopy = precision;
 	while (precisionCopy > 0 && !isFullyDivided)
 	{
+		cout << endl << "Head: ";
+		displayNumber(head1);
+		cout << endl;
 		
 		/*
 		Multiplies the denomeinator 'n' times.
@@ -1275,18 +1278,10 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 				subtract(counterHead, oneHead, counterTail, oneTail, counterExponent, oneExpnent, counterDigit, oneDigit, counterSign, oneSign, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign);
 				destroyLinkedList(counterHead, counterTail);
 				copyLinkedList(counterHead, counterTail, productCheckerHead);
-				counterExponent = productCheckerExponent;
-
-				len = lengthOfNode(productCheckerHead);
-				if (len > productCheckerExponent)
-					counterDigit = len;
-				else
-					counterDigit = productCheckerExponent;
-				
 			}
 			
-			int counterExponentCopy = counterExponent;
-			while (counterHead != NULL || counterExponentCopy!=0)
+			//int counterExponentCopy = counterExponent
+			while (counterHead != NULL || counterExponent!=0)
 			{
 				
 				/*
@@ -1301,20 +1296,17 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 				}
 				else
 					p->digit = '0'; // If expnent is greater than the number of digits then the value 0 is added to the answer.
-				counterExponentCopy--;
+				counterExponent--;
 				insertNodeAtTail(answerHead, answerTail, p);
-				cout << "x ";
-				displayNumberExponent(answerHead, answerExponent, 1);
+				//cout << endl << "=> ";
+				//displayNumber(answerHead);
+				//cout << endl;
 				
 			}
 
-			copyLinkedList(counterHead, counterTail, productCheckerHead); // Return the value of counter after copied to answer.
-			
-
 			if (!isExponentFixed) // This occurs once to set the expnent of the answer.
 			{
-				
-				isExponentFixed = true;
+				isExponentFixed;
 				answerExponent = productCheckerExponent;
 			}
 			if (comparisionValue == 0)
@@ -1322,7 +1314,6 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 				isFullyDivided = true;  // If the number is fully divided.
 				return;
 			}
-
 			int len = lengthOfNode(productCheckerHead);
 			if (len > productCheckerExponent)
 				productCheckerDigits = len;
@@ -1330,33 +1321,26 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 				productCheckerDigits = productCheckerExponent;
 
 			destroyLinkedList(productCheckerHead, productCheckerTail);
-			//counterExponent++;
-			multiply(counterHead, counterTail, head2, tail2, counterExponent, exponent2, counterDigit, digit2, counterSign, sign2, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign); // Holds the product of counter and denominator
+			counterExponent++;
+			multiply(counterHead, counterTail, head2, tail2, counterExponent, exponent1, counterDigit, digit2, counterSign, sign2, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign); // Holds the product of counter and denominator
 			destroyLinkedList(counterHead, counterTail); //Clears space 
 			len = lengthOfNode(productCheckerHead); // Gets approperiate productCheckerDigits
 			if (len > productCheckerExponent)
 				productCheckerDigits = len;
 			else
 				productCheckerDigits = productCheckerExponent;
-			len = lengthOfNode(counterHead);
-			if (len > counterExponent)
-				counterDigit = len;
-			else
-				counterDigit = counterExponent;
-//			cout << "PE->" << counterExponent;
-	//		cout << endl << "Counter 1: "; displayNumberExponent(counterHead, counterExponent, sign1); 
-		//	cout << endl;
-			//cout << endl << "Product :"; displayNumberExponent(productCheckerHead, productCheckerExponent, 1);
-			//cout << endl;
+			cout << "PE->" << counterExponent;
+			cout << endl << "Counter 1: "; displayNumberExponent(counterHead, counterExponent, sign1); 
+			cout << endl;
+			cout << endl << "Product :"; displayNumberExponent(productCheckerHead, productCheckerExponent, 1);
+			cout << endl;
 
 			subtract(head1, productCheckerHead, tail1, productCheckerTail,exponent1, productCheckerExponent, digit1, productCheckerDigits, sign1, productCheckerSign, counterHead, counterTail, counterExponent, counterSign); // Subtracts product from tail1
 			destroyLinkedList(head1, tail1);
 			copyLinkedList(head1, tail1, counterHead); // Replaces the numerator for further evaluation
 			exponent1 = counterExponent;
-			trimHeadAndTail(head1, tail1, digit1, exponent1, sign1);
-			trimHeadAndTail(counterHead, counterTail, counterDigit, counterExponent, counterSign);
 
-			//cout << "Changed : "; displayNumberExponent(head1, exponent1, sign1);
+			cout << "Changed : "; displayNumberExponent(head1, exponent1, sign1);
 
 			len = lengthOfNode(counterHead); 
 			if (len > counterExponent)	//Gets approperiate digits for the numerator
@@ -1372,20 +1356,6 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 				answerDigit = answerExponent;
 
 			precisionCopy = precision - answerDigit;
-			
-			destroyLinkedList(counterHead, counterTail);
-			node* x = new node;
-			x->digit = '1';
-			counterExponent = counterDigit = 1;
-			insertNodeAtHead(counterHead, counterTail, x);
-			x = NULL;
-
-			x = new node;
-			x->digit = '0';
-			insertNodeAtTail(head1, tail1, x);
-			exponent1++;
-			digit1++;
-
 			
 		}
 		else
