@@ -801,23 +801,33 @@ void subtractBigMinusSmall(node* tail1, node* tail2, int exponent1, int exponent
 	}
 	carry = 0;
 	int length = lengthOfNodeFromBack(tail1);
-	int digit2 = lengthOfNodeFromBack(tail2);
-	if (digit2 < exponent2)
-		digit2 = exponent2;
+	int length2 = lengthOfNodeFromBack(tail2);
+
 	bool wasCarried = false;
 	while (tail1 != NULL)
 	{
 		/*
 		This loop traverses through the rest of the elements.
 		*/
+		while (exponent2 > length2)
+		{
+			if (tail1 != NULL)
+				p->digit = tail1->digit;
+			else
+				p->digit = '0';
+			insertNodeAtHead(returnHead, returnTail, p);
+			p = new node;
+			tail1 = tail1->behind;
+			exponent2--;
 
+		}
 		int val1, val2;
 		p = new node;
 
 		if (tail2 == NULL) //If there are no more digits to be subtracted, the value to be subtracted will be zero.
 			val2 = 0;
 		else
-			val2 = toInt(tail2->digit);
+ 			val2 = toInt(tail2->digit);
 
 		if (exponent1 > length )
 		{
@@ -884,15 +894,11 @@ void subtract(node* subtracteeHead, node* subtractorHead, node* subtracteeTail, 
 	node* p = new node;
 	int carry = 0;
 	int afterDecimalSubtractor, afterDecimalSubtractee;
-	if (subtractorExponent <= 0)
-		afterDecimalSubtractor = subtractorDigits;
-	else
-		afterDecimalSubtractor = subtractorDigits - subtractorExponent;
 
-	if (subtracteeExponent <= 0)
-		afterDecimalSubtractee = subtracteeDigits;
-	else
-		afterDecimalSubtractee = subtracteeDigits - subtracteeExponent;
+	afterDecimalSubtractor = subtractorDigits - subtractorExponent;
+
+
+	afterDecimalSubtractee = subtracteeDigits - subtracteeExponent;
 	if (subtracteeSign != subtractorSign)
 	{
 		if (subtractorSign == -1)
@@ -1027,17 +1033,11 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 	/*
 	This gets the number of digits after the decimal of the first number.
 	*/
-	if (exponent1 <= 0)
-		num1afterDecimal = digit1 - exponent1;
-	else
-		num1afterDecimal = digit1 - exponent1;
+	num1afterDecimal = digit1 - exponent1;
 	/*
 	This gets the number of digits after the decimal of the second number.
 	*/
-	if (exponent2 <= 0)
-		num2afterDecimal = digit2-exponent2;
-	else
-		num2afterDecimal = digit2 - exponent2;
+	num2afterDecimal = digit2 - exponent2;
 
 	/*
 	The number of digits after the decimal of the product is the sum of the number of digits after the decimal of the two operands.
@@ -1301,10 +1301,7 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 		/*
 		Set the value of the product's digits.
 		*/
-		cout << endl;
-		cout << "Exponent 1: " << exponent1 << endl;
-		cout << "Exponent 2: " << exponent2 << endl;
-
+		
 		int len = lengthOfNode(productCheckerHead);
 		if (len > productCheckerExponent)
 			productCheckerDigits = len;
@@ -1524,11 +1521,11 @@ int main()
 	  //cout<<"Exponent 2 Before Subtract: "<<exponent2<<endl;
 	digits1 = getDigits(head1, exponent1);
 	digits2 = getDigits(head2, exponent2);
-	//subtract(head1, head2, tail1, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
+	subtract(head1, head2, tail1, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
 
 	//multiply(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
 
-	divide(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign,15);
+	//divide(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign,15);
 	cout << endl << endl << endl;
 	  cout<<"The difference is ";
 	displayNumberExponent(resultHead, resultExponent, resultSign);
