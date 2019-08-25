@@ -1028,14 +1028,14 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 	This gets the number of digits after the decimal of the first number.
 	*/
 	if (exponent1 <= 0)
-		num1afterDecimal = digit1;
+		num1afterDecimal = digit1 - exponent1;
 	else
 		num1afterDecimal = digit1 - exponent1;
 	/*
 	This gets the number of digits after the decimal of the second number.
 	*/
 	if (exponent2 <= 0)
-		num2afterDecimal = digit2;
+		num2afterDecimal = digit2-exponent2;
 	else
 		num2afterDecimal = digit2 - exponent2;
 
@@ -1058,7 +1058,12 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 	if (sign1 == 0 || sign2 == 0)
 		productSign = 0;
 
-
+	bool isXOne = false;
+	bool isYOne = false;
+	if ((digit2 == 1 && exponent2 == 1 && head2->digit == '1'))
+		isYOne = true;
+	if ((digit1 == 1 && exponent1 == 1 && head1->digit == '1'))
+		isXOne = true;
 	/*
 	Psedo sum holds the products of the top number by a single digit lower number.
 
@@ -1132,6 +1137,7 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 		}
 		while (num1 != NULL)
 		{
+			
 			int product = toInt(num1->digit) * toInt(num2->digit) + carry; // The product of the digits
 			int result = product % 10; // If there is carry, then it is sstored.
 			if (num1->behind == NULL)
@@ -1199,7 +1205,21 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 	}
 
 	//The exponent is calculated by understanding that the digits before the decimal is is the total digits minus the digits after the decimal.
-	productExponent = productCloneDigits - productAfterDecimal;
+	if (isXOne)
+		productExponent = exponent2;
+	else if (isYOne)
+		productExponent = exponent1;
+	else 
+		productExponent = productCloneDigits - productAfterDecimal;
+
+	for (int i = lengthOfNode(head1); i < exponent1 || i < exponent2; i++)
+	{
+		node* x = new node;
+		x->digit = '0';
+		insertNodeAtTail(productHead, productTail, x);
+		productExponent++;
+	}
+
 	return;
 	
 }
@@ -1281,6 +1301,10 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 		/*
 		Set the value of the product's digits.
 		*/
+		cout << endl;
+		cout << "Exponent 1: " << exponent1 << endl;
+		cout << "Exponent 2: " << exponent2 << endl;
+
 		int len = lengthOfNode(productCheckerHead);
 		if (len > productCheckerExponent)
 			productCheckerDigits = len;
@@ -1490,7 +1514,6 @@ int main()
 
 	cout << endl;
 	getNumberExponent(head2, tail2, exponent2, digits2, sign2);
-
 
 	//  cout<<"NUM 2: ";
 
