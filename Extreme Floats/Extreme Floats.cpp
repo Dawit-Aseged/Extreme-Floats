@@ -905,14 +905,17 @@ void subtract(node* subtracteeHead, node* subtractorHead, node* subtracteeTail, 
 	afterDecimalSubtractee = subtracteeDigits - subtracteeExponent;
 	if (subtracteeSign != subtractorSign)
 	{
-		if (subtractorSign == -1)
+		if (subtractorSign == -1 )
 		{
 			differenceSign = 1;
 			addExponent(subtracteeTail, subtractorTail, subtracteeExponent, subtractorExponent, subtracteeDigits, subtractorDigits, differenceHead, differenceTail, differenceExponent);
 		}
 		else
 		{
-			differenceSign = -1;
+			if (subtractorSign != 0)
+				differenceSign = -1;
+			else
+				differenceSign = subtracteeSign;
 			addExponent(subtracteeTail, subtractorTail, subtracteeExponent, subtractorExponent, subtracteeDigits, subtractorDigits, differenceHead, differenceTail, differenceExponent);
 		}
 		return;
@@ -1538,11 +1541,11 @@ int main()
 	  //cout<<"Exponent 2 Before Subtract: "<<exponent2<<endl;
 	digits1 = getDigits(head1, exponent1);
 	digits2 = getDigits(head2, exponent2);
-	//subtract(head1, head2, tail1, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
+	subtract(head1, head2, tail1, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
 
 	//multiply(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
 
-	divide(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign,15);
+	//divide(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign,15);
 	cout << endl << endl << endl;
 	  cout<<"The difference is ";
 	displayNumberExponent(resultHead, resultExponent, resultSign);
