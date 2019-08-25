@@ -772,6 +772,7 @@ void subtractBigMinusSmall(node* tail1, node* tail2, int exponent1, int exponent
 					insertNodeAtHead(returnHead, returnTail, x);
 					tail2 = tail2->behind;
 					exponent1--;
+					exponent2--;
 				}
 
 				if (!isShifted)
@@ -790,7 +791,8 @@ void subtractBigMinusSmall(node* tail1, node* tail2, int exponent1, int exponent
 					p2->digit = toChar(toInt(p2->digit) - 1);
 					carry = 0;
 				}
-				p2 = p2->behind;
+				if(p2->behind!=NULL)
+					p2 = p2->behind;
 
 			} while (carry);
 		}
@@ -851,8 +853,10 @@ void subtractBigMinusSmall(node* tail1, node* tail2, int exponent1, int exponent
 		If there is no carry then, val1 is just tail of the subtractee.
 		Otherwise, it is that tail of the subtractee plus 10.
 		*/
-		val1 = toInt((tail1->digit) + (10 * carry));
-
+		//if (tail1 != NULL)
+			val1 = toInt((tail1->digit) + (10 * carry));
+		//else
+		//	val1 = 0;
 
 		if (val1 >= val2)
 		{
@@ -1206,20 +1210,35 @@ void multiply(node* head1, node* tail1, node* head2, node* tail2, int exponent1,
 
 	//The exponent is calculated by understanding that the digits before the decimal is is the total digits minus the digits after the decimal.
 	if (isXOne)
+	{
 		productExponent = exponent2;
+		return;
+	}
 	else if (isYOne)
+	{
 		productExponent = exponent1;
+		return;
+	}
 	else 
 		productExponent = productCloneDigits - productAfterDecimal;
-
-	for (int i = lengthOfNode(head1); i < exponent1 || i < exponent2; i++)
-	{
-		node* x = new node;
-		x->digit = '0';
-		insertNodeAtTail(productHead, productTail, x);
-		productExponent++;
-	}
-
+	if (lengthOfNode(head1) < exponent1)
+		for (int i = lengthOfNode(head1); i < exponent1; i++)
+		{
+			node* x = new node;
+			x->digit = '0';
+			insertNodeAtTail(productHead, productTail, x);
+			productExponent++;
+			productExponent -= productAfterDecimal;
+		}
+	else
+		for (int i = lengthOfNode(head2); i < exponent2; i++)
+		{
+			node* x = new node;
+			x->digit = '0';
+			insertNodeAtTail(productHead, productTail, x);
+			productExponent++;
+			productExponent -= productAfterDecimal;
+		}
 	return;
 	
 }
@@ -1298,16 +1317,18 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 		trimHeadAndTail(head1, tail1, digit1, exponent1, sign1);
 		digit1 = getDigits(head1, exponent1);
 		multiply(counterHead, counterTail, head2, tail2, counterExponent, exponent2, counterDigit, digit2, counterSign, sign2, productCheckerHead, productCheckerTail, productCheckerExponent, productCheckerSign);
+
+		cout << endl;
+		cout << "Product: "; displayNumberExponent(productCheckerHead, productCheckerExponent, productCheckerSign);
+		cout << endl;
+
 		/*
 		Set the value of the product's digits.
 		*/
 		
-		int len = lengthOfNode(productCheckerHead);
-		if (len > productCheckerExponent)
-			productCheckerDigits = len;
-		else
-			productCheckerDigits = productCheckerExponent;
-
+		productCheckerDigits = getDigits(productCheckerHead, productCheckerExponent);
+		trimHeadAndTail(productCheckerHead, productCheckerTail, productCheckerDigits, productCheckerExponent, productCheckerSign);
+		productCheckerDigits = getDigits(productCheckerHead, productCheckerExponent);
 		int comparisionValue =  isGreater(productCheckerHead, head1, productCheckerDigits, digit1, productCheckerExponent, exponent1);
 		
 		if (comparisionValue >= 0)
@@ -1326,11 +1347,7 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 				copyLinkedList(counterHead, counterTail, productCheckerHead);
 				counterExponent = productCheckerExponent;
 
-				len = lengthOfNode(productCheckerHead);
-				if (len > productCheckerExponent)
-					counterDigit = len;
-				else
-					counterDigit = productCheckerExponent;
+				productCheckerDigits = getDigits(productCheckerHead, productCheckerExponent);
 				
 			}
 			trimHeadAndTail(counterHead, counterTail, counterDigit, counterExponent, counterSign);
@@ -1451,7 +1468,7 @@ void divide(node* head1, node* tail1, node* head2, node* tail2, int exponent1, i
 			
 
 			
-			len = lengthOfNode(answerHead);
+			
 			int answerDigit = getDigits(answerHead, answerExponent);
 			
 			precisionCopy = precision - answerDigit;
@@ -1521,11 +1538,11 @@ int main()
 	  //cout<<"Exponent 2 Before Subtract: "<<exponent2<<endl;
 	digits1 = getDigits(head1, exponent1);
 	digits2 = getDigits(head2, exponent2);
-	subtract(head1, head2, tail1, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
+	//subtract(head1, head2, tail1, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
 
 	//multiply(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign);
 
-	//divide(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign,15);
+	divide(head1, tail1, head2, tail2, exponent1, exponent2, digits1, digits2, sign1, sign2, resultHead, resultTail, resultExponent, resultSign,15);
 	cout << endl << endl << endl;
 	  cout<<"The difference is ";
 	displayNumberExponent(resultHead, resultExponent, resultSign);
